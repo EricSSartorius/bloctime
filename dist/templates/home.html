@@ -1,4 +1,4 @@
 <section>
-	<h1>{{ theTime }}</h1>
+	<h1>{{ theTime | timeFilter | date:'mm:ss'}}</h1>
 	<my-button></my-button>
 </section>
