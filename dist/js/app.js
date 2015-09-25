@@ -22,14 +22,16 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 .directive('myButton', function($interval) {
 
     return {
-        template: '<div><h1>{{ theTime | timeFilter | date:"mm:ss"}}</h1><button ng-click="clickStart()">{{theButton}}</button><div>',
+        template: '<div><h1>{{ theTime | timeFilter | date:"mm:ss"}}</h1><button ng-click="clickStart()"><b>{{theButton}}<b></button><div>',
         restrict: 'E',
         replace: true,
         scope: { },
         link: function(scope, element, attributes) {
+        	scope.onBreak = false;
         	scope.theTime = 1500;
     		scope.theButton = "START";
     		var theTimer;
+
 		    scope.clickStart = function() {
 		        if(scope.theButton == "RESET") {
 		           	scope.theTime = 1500;
