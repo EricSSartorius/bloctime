@@ -1,18 +1,25 @@
 
 html {
-  text-align: center;
-  font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
-  font-weight: 300;
-  font-size: 20px;
-  line-height: 1.75em;
+    text-align: center;
+    font-family: sans-serif;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+    font-weight: 300;
+    font-size: 36px;
+    line-height: 1.75em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%)
 }
 button {
-  font-family: sans-serif;
-  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
-  font-weight: 300;
-  font-size: 20px;
+    font-family: sans-serif;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+    font-weight: 300;
+    font-size: 36px;
 
 }
