@@ -42,7 +42,7 @@ module.exports = function(grunt) {
                     './app/sass/**/*.scss',
                     './app/css/**/*.css',
                     './app/pages/**/*.html',
-                    './app/templates/**/*.html',
+                    './app/templates/**/*.html', 
                     'Gruntfile.js'
                 ],
                 tasks: [
