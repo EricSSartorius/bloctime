@@ -1,5 +1,5 @@
-Bloc Pomodoro
+Bloctime
 =================
 
-Pomodoro Bloc frontend project.
+Bloctime frontend project.
 

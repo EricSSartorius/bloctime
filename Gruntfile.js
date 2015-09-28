@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         autoprefixer: {
             dist: {
                 files: {
-                    './dist/css/style.css': './dist/css/style.css'
+                    './dist/css/style.css': './app/css/style.css'
                 }
             }
         },

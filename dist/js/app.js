@@ -22,23 +22,50 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 .directive('myButton', function($interval) {
 
     return {
-        template: '<div><h1>{{ theTime | timeFilter | date:"mm:ss"}}</h1><button ng-click="clickStart()">{{theButton}}</button><div>',
+        templateUrl: '/templates/mybutton.html',
         restrict: 'E',
         replace: true,
         scope: { },
         link: function(scope, element, attributes) {
+        	scope.onBreak = false;
         	scope.theTime = 1500;
     		scope.theButton = "START";
+    		scope.breakButton = "BREAK START";
     		var theTimer;
+    		
 		    scope.clickStart = function() {
-		        if(scope.theButton == "RESET") {
-		           	scope.theTime = 1500;
+		        if(scope.theButton === "RESET"  || scope.breakButton === "BREAK RESET") {
+		        	if (scope.onBreak) {
+		        		scope.theTime = 300;
+		        	}
+		        	else {
+		           		scope.theTime = 1500;
+		            }
 		           	$interval.cancel(theTimer);
 		           	scope.theButton = "START";
+		           	scope.breakButton = "BREAK START";
 		        }
 		        else {
-		           	theTimer = $interval(function(){scope.theTime--},1000,0);
-		           	scope.theButton = "RESET"; 
+					scope.breakButton = "BREAK RESET";
+		        	scope.theButton = "RESET";
+		           	theTimer = $interval(function(){	
+		           		scope.theTime--
+		           		if (scope.theTime === 0) {
+		           			$interval.cancel(theTimer);
+		           			if (!scope.onBreak) {
+			           			scope.onBreak = true;
+			           			scope.theTime = 300;
+		            			scope.breakButton ="BREAK START";
+		           				scope.theButton = "START";
+	            			}
+	            			else {
+	            				scope.breakButton ="BREAK START";
+		           				scope.theButton = "START";
+	            				scope.onBreak = false;
+			           			scope.theTime = 1500;
+	            			}
+		           		}
+		           	},1000,0);  
 		        }   
 			};
     	}
