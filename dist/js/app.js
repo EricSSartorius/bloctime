@@ -11,9 +11,36 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller', ['$scope', '$firebaseObject', '$interval', function ($scope, $firebaseObject, $interval) {
+.controller('Home.controller', ['$scope', function ($scope, MyTasks) {
+
+    $scope.addTask = function() {
+      MyTasks.tasks.$add({
+        content: $scope.task,
+        timestamp: Firebase.ServerValue.TIMESTAMP
+      });
+      $scope.task = "";
+    };
+
+    // MyTasks.tasks.$loaded(function() {
+    //   if (MyTasks.tasks.length === 0) {
+    //     myTasks.tasks.$add({
+    //       content: "First Test Task!",
+    //       timestamp: Firebase.ServerValue.TIMESTAMP
+    //     });
+    //   }
+    // });
+
+}])
+.factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
+
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com");
-    $scope.data = $firebaseObject(ref);
+	var tasks = $firebaseArray(ref);
+
+	return {
+	    all: function() {
+	    	return tasks.$asArray();
+		}
+	}
 }])
 .constant("MY_EVENTS", {
 	breakTime: 300,

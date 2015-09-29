@@ -1,3 +1,21 @@
-<section>
-	<my-button></my-button>
-</section>
+<div class="wrapper">
+	<aside id="sidebar">
+		<h1>Task History</h1>
+		<ul class="task-list">
+    		<li ng-repeat="task in tasks | orderBy:'reverse'">
+		 	{{ task.content }}
+		 	<a href="" ng-click="tasks.$remove(task)">X</a>
+    		</li>
+ 		 </ul>
+        <form ng-submit="addTask()">
+    		<input placeholder="Add new task" type="text" ng-model="task">
+    		<input type="submit">
+  		</form>
+	</aside>
+	<div class="content-wrapper">
+		<section id="content">
+			<h1>Bloctime</h1>
+			<my-button></my-button>
+		</section>
+	</div>
+</div>

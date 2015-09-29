@@ -1,25 +1,48 @@
 
 html {
-    text-align: center;
-    font-family: sans-serif;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
     font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+}
+
+body {
+    margin: 0;
+}
+
+.task-list {
+    
+}
+
+.timer-button {
+    font-family: sans-serif;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
+    font-weight: 300;
+    font-size: 36px;
+}
+
+.wrapper {
+  max-width: 1160px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 600px;
+}
+
+.content-wrapper {
+  float: left;
+  width: 100%;
+}
+#sidebar {
+    padding: 15px;
+    background-color: #666;  
+    position: relative;
+    min-height: 200px;
+}
+
+#sidebar h1 {
+    margin: 0; 
+}
+
+#content {
+    text-align: center;
     font-weight: 300;
     font-size: 36px;
     line-height: 1.75em;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%)
-}
-button {
-    font-family: sans-serif;
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
-    font-weight: 300;
-    font-size: 36px;
-
 }
