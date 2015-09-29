@@ -16,8 +16,10 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
     $scope.data = $firebaseObject(ref);
 }])
 .constant("MY_EVENTS", {
-	// "THE_TIME": "theTime",
-	// "INTERVAL": "$interval",
+	breakTime: 300,
+	workTime: 1500,
+	longBreakTime: 1800,
+	workCycle: 4
 })
 .directive('myButton', ['MY_EVENTS', "$interval", function(MY_EVENTS, $interval) {
     return {
@@ -27,7 +29,7 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
         scope: { },
         link: function(scope, element, attributes) {
         	scope.onBreak = false;
-        	scope.theTime = 10;
+        	scope.theTime = MY_EVENTS.workTime;
         	scope.sessionCounter = 0;
     		scope.theButton = "START";
     		scope.breakButton = "BREAK START";
@@ -37,23 +39,18 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
   				preload: true
 			});
 			
-    		scope.countSession = function() {
-    			scope.sessionCounter++;
-    			if (scope.sessionCounter === 5) {
-    				scope.sessionCounter = 1;
-    			}
-    			console.log("sessions: " + scope.sessionCounter);
-    		};
-    		scope.setFourthBreak = function() {
-    			if (scope.sessionCounter === 4) {
-    				scope.theTime = 2;
+    		console.log("sessions: " + scope.sessionCounter);
+
+    		scope.determineBreak = function() {
+    			if (scope.sessionCounter === MY_EVENTS.workCycle) {
+    				scope.theTime = MY_EVENTS.longBreakTime;
     			}
     			else {
-		        	scope.theTime = 5;
+		        	scope.theTime = MY_EVENTS.breakTime;
 		        }
     		};
     		scope.watchTimer = function() {
-    			scope.$watch('theTime', function() {
+    			// scope.$watch('theTime', function() {
 	 				console.log("Countdown: " + scope.theTime);
 	 				if (scope.theTime === 0) {
           				mySound.play();
@@ -61,16 +58,21 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	 				else {
 	 					return;
 	 				}
-				});
+				// });
     		};
     		scope.resetPomodoTimer = function() {
     			scope.onBreak = true;
-				scope.setFourthBreak();
+    			scope.sessionCounter++;
+				scope.determineBreak();
+				if (scope.sessionCounter === MY_EVENTS.workCycle) {
+    				scope.sessionCounter = 0;
+    			}
+				console.log("sessions: " + scope.sessionCounter);
 				scope.theButton = "START";
     		};
     		scope.resetBreakTimer = function() {
     			scope.onBreak = false;
-				scope.theTime = 10;
+				scope.theTime = MY_EVENTS.workTime;
 				scope.breakButton ="BREAK START";
     		};
     		scope.startTimer = function() {
@@ -90,20 +92,18 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
     		};
 		    scope.handleWorkClick= function() {
 		        if(scope.theButton === "RESET") {
-		        	scope.theTime = 10;
+		        	scope.theTime = MY_EVENTS.workTime;
 		        	$interval.cancel(theTimer);
 		        	scope.theButton = "START";
-		        	scope.sessionCounter --;
 		        }
 		        else {
 		        	scope.theButton = "RESET";
 					scope.startTimer();
-					scope.countSession();
 		        }   
 			};
 			scope.handleBreakClick= function() {
 		        if(scope.breakButton === "BREAK RESET") {
-		        	scope.setFourthBreak();
+		        	scope.determineBreak();
 		        	$interval.cancel(theTimer);
 		        	scope.breakButton = "BREAK START";
 		        }
