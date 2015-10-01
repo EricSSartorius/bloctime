@@ -1,5 +1,5 @@
 <div>
 	<h1>{{ theTime | timeFilter | date:"mm:ss"}}</h1>
-	<button ng-hide="onBreak" ng-click="clickStart()"><b>{{theButton}}<b></button>
-	<button ng-show="onBreak" ng-click="clickStart()"><b>{{breakButton}}<b></button>
+	<button class="timer-button" ng-hide="onBreak" ng-click="handleWorkClick()"><b>{{theButton}}<b></button>
+	<button class="timer-button" ng-show="onBreak" ng-click="handleBreakClick()"><b>{{breakButton}}<b></button>
 <div>
