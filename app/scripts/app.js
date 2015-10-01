@@ -11,24 +11,25 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller', ['$scope', function ($scope, MyTasks) {
-
+.controller('Home.controller', ['$scope', 'MyTasks', function ($scope, MyTasks) {
     $scope.addTask = function() {
-      MyTasks.tasks.$add({
+      MyTasks.all.$add({
         content: $scope.task,
         timestamp: Firebase.ServerValue.TIMESTAMP
       });
       $scope.task = "";
     };
 
-    // MyTasks.tasks.$loaded(function() {
-    //   if (MyTasks.tasks.length === 0) {
-    //     myTasks.tasks.$add({
-    //       content: "First Test Task!",
-    //       timestamp: Firebase.ServerValue.TIMESTAMP
-    //     });
-    //   }
-    // });
+    $scope.tasks = MyTasks.all;
+
+    MyTasks.all.$loaded(function() {
+      if (MyTasks.all.length === 0) {
+        MyTasks.all.$add({
+          content: "First Test Task!",
+          timestamp: Firebase.ServerValue.TIMESTAMP
+        });
+      }
+    });
 
 }])
 .factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
@@ -37,10 +38,8 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	var tasks = $firebaseArray(ref);
 
 	return {
-	    all: function() {
-	    	return tasks.$asArray();
-		}
-	}
+	    all: tasks
+	};
 }])
 .constant("MY_EVENTS", {
 	breakTime: 300,
@@ -76,17 +75,14 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		        	scope.theTime = MY_EVENTS.breakTime;
 		        }
     		};
-    		scope.watchTimer = function() {
-    			// scope.$watch('theTime', function() {
-	 				console.log("Countdown: " + scope.theTime);
-	 				if (scope.theTime === 0) {
-          				mySound.play();
-	 				}
-	 				else {
-	 					return;
-	 				}
-				// });
-    		};
+    		
+			scope.$watch('theTime', function() {
+ 				console.log("Countdown: " + scope.theTime);
+ 				if (scope.theTime === 0) {
+      				mySound.play();
+ 				}
+			});
+
     		scope.resetPomodoTimer = function() {
     			scope.onBreak = true;
     			scope.sessionCounter++;
@@ -114,7 +110,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 			            	scope.resetBreakTimer();
 			            }
 				    }
-					scope.watchTimer();
 			    },1000,0);  
     		};
 		    scope.handleWorkClick= function() {

@@ -18,22 +18,15 @@ body {
     font-size: 36px;
 }
 
-.wrapper {
-  max-width: 1160px;
-  margin: 0 auto;
-  position: relative;
-  min-height: 600px;
-}
 
-.content-wrapper {
-  float: left;
-  width: 100%;
-}
+
 #sidebar {
     padding: 15px;
     background-color: #666;  
-    position: relative;
-    min-height: 200px;
+    position:absolute;
+    top:0;
+    left: 0;
+    bottom:0
 }
 
 #sidebar h1 {
@@ -41,6 +34,7 @@ body {
 }
 
 #content {
+    margin-left: 100px;
     text-align: center;
     font-weight: 300;
     font-size: 36px;
