@@ -11,7 +11,47 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller', ['$scope', 'MyTasks', function ($scope, MyTasks) {
+.controller('Home.controller', ['$scope', '$rootScope', '$firebaseAuth','MyTasks', function ($scope, $rootScope, $firebaseAuth, MyTasks) {
+
+    // $scope.signIn = function () {
+    //   $rootScope.auth.$login('password', {
+    //     email: $scope.email,
+    //     password: $scope.password
+    //   }).then(function(user) {
+    //     $rootScope.alert.message = '';
+    //   }, function(error) {
+    //     if (error = 'INVALID_EMAIL') {
+    //       console.log('email invalid or not signed up — trying to sign you up!');
+    //       $scope.signUp();
+    //     } else if (error = 'INVALID_PASSWORD') {
+    //       console.log('wrong password!');
+    //     } else {
+    //       console.log(error);
+    //     }
+    //   });
+    // };
+
+    // $scope.signUp = function() {
+    //   $rootScope.auth.$createUser($scope.email, $scope.password, function(error, user) {
+    //     if (!error) {
+    //       $rootScope.alert.message = '';
+    //     } else {
+    //       $rootScope.alert.class = 'danger';
+    //       $rootScope.alert.message = 'The username and password combination you entered is invalid.';
+    //     }
+    //   });
+    // };
+
+    $scope.loginToFB = function() {
+   
+    };
+    $scope.signUp = function() {
+
+    };
+    $scope.signIn = function() {
+
+    };
+
     $scope.addTask = function() {
       MyTasks.all.$add({
         content: $scope.task,
@@ -25,7 +65,7 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
     MyTasks.all.$loaded(function() {
       if (MyTasks.all.length === 0) {
         MyTasks.all.$add({
-          content: "First Test Task!",
+          content: "Add a new Task here!",
           timestamp: Firebase.ServerValue.TIMESTAMP
         });
       }
@@ -35,6 +75,54 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 .factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
 
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com");
+
+
+	function authDataCallback(authData) {
+	  if (authData) {
+	    console.log("User " + authData.uid + " is logged in with " + authData.provider);
+	  } else {
+	    console.log("User is logged out");
+	  }
+	}
+
+	ref.onAuth(authDataCallback);
+
+
+	
+	ref.authWithOAuthPopup("facebook", function(error, authData) {
+	  if (error) {
+	    console.log("Login Failed!", error);
+	  } else {
+	    console.log("Authenticated successfully with payload:", authData);
+	  }
+	});
+	ref.createUser({
+	  email    : "iamtheepic@gmail.com",
+	  password : "kimchiplease"
+	}, function(error, userData) {
+	  if (error) {
+	    console.log("Error creating user:", error);
+	  } else {
+	    console.log("Successfully created user account with uid:", userData.uid);
+	  }
+	});
+	ref.authWithPassword({
+	  email    : "iamtheepic@gmail.com",
+	  password : "kimchiplease"
+	}, function(error, authData) {
+	  if (error) {
+	    console.log("Login Failed!", error);
+	  } else {
+	    console.log("Authenticated successfully with payload:", authData);
+	  }
+	});
+	ref.authWithPassword({
+	  email    : "iamtheepic@gmail.com",
+	  password : "kimchiplease"
+	}, function(error, authData) { /* Your Code */ }, {
+	  remember: "sessionOnly"
+	});
+
 	var tasks = $firebaseArray(ref);
 
 	return {
@@ -59,13 +147,16 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
         	scope.sessionCounter = 0;
     		scope.theButton = "START";
     		scope.breakButton = "BREAK START";
+    		scope.$watch('theTime', function() {
+ 				if (scope.theTime === 0) {
+      				mySound.play();
+ 				}
+			});
     		var theTimer;
     		var mySound = new buzz.sound( "/sounds/dingdong", {
   				formats: [ 'mp3' ],
   				preload: true
 			});
-			
-    		console.log("sessions: " + scope.sessionCounter);
 
     		scope.determineBreak = function() {
     			if (scope.sessionCounter === MY_EVENTS.workCycle) {
@@ -75,14 +166,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		        	scope.theTime = MY_EVENTS.breakTime;
 		        }
     		};
-    		
-			scope.$watch('theTime', function() {
- 				console.log("Countdown: " + scope.theTime);
- 				if (scope.theTime === 0) {
-      				mySound.play();
- 				}
-			});
-
     		scope.resetPomodoTimer = function() {
     			scope.onBreak = true;
     			scope.sessionCounter++;
@@ -90,7 +173,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 				if (scope.sessionCounter === MY_EVENTS.workCycle) {
     				scope.sessionCounter = 0;
     			}
-				console.log("sessions: " + scope.sessionCounter);
 				scope.theButton = "START";
     		};
     		scope.resetBreakTimer = function() {

@@ -1,4 +1,16 @@
 	<aside id="sidebar" >
+	 <form role="form">
+            <input ng-model="user.email" type="email" placeholder="Email address" required="" autofocus="">
+            <input ng-model="user.password" type="password" placeholder="Password" required="">
+            <label class="checkbox">
+            <br/>
+            <button ng-click="SignUp($event)">SignUp</button>
+        </label>
+        <button ng-click="SignIn($event)">SignIn</button>
+      </form>
+      <br/>
+      <button ng-click="loginToFB($event)">FB LOGIN</button>
+      <br/>
 		<h1>Task History</h1>
 		 <form ng-submit="addTask()">
     		<input placeholder="Add new task" type="text" ng-model="task">
