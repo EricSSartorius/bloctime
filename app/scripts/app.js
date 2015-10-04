@@ -43,15 +43,17 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
     // };
 
     $scope.loginToFB = function() {
-   
+   		MyTasks.fbLogin();
     };
     $scope.signUp = function() {
-
+    	return MyTasks.signUp;
     };
     $scope.signIn = function() {
-
+    	return MyTasks.signIn;
     };
-
+    $scope.signOut = function() {
+		return MyTasks.signOut;
+    };
     $scope.addTask = function() {
       MyTasks.all.$add({
         content: $scope.task,
@@ -84,49 +86,55 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	    console.log("User is logged out");
 	  }
 	}
-
 	ref.onAuth(authDataCallback);
 
-
-	
-	ref.authWithOAuthPopup("facebook", function(error, authData) {
-	  if (error) {
-	    console.log("Login Failed!", error);
-	  } else {
-	    console.log("Authenticated successfully with payload:", authData);
-	  }
-	});
-	ref.createUser({
-	  email    : "iamtheepic@gmail.com",
-	  password : "kimchiplease"
-	}, function(error, userData) {
-	  if (error) {
-	    console.log("Error creating user:", error);
-	  } else {
-	    console.log("Successfully created user account with uid:", userData.uid);
-	  }
-	});
-	ref.authWithPassword({
-	  email    : "iamtheepic@gmail.com",
-	  password : "kimchiplease"
-	}, function(error, authData) {
-	  if (error) {
-	    console.log("Login Failed!", error);
-	  } else {
-	    console.log("Authenticated successfully with payload:", authData);
-	  }
-	});
-	ref.authWithPassword({
-	  email    : "iamtheepic@gmail.com",
-	  password : "kimchiplease"
-	}, function(error, authData) { /* Your Code */ }, {
-	  remember: "sessionOnly"
-	});
+	// ref.authWithPassword({
+	//   email    : "iamtheepic@gmail.com",
+	//   password : "kimchiplease"
+	// }, function(error, authData) { /* Your Code */ }, {
+	//   remember: "sessionOnly"
+	// });
 
 	var tasks = $firebaseArray(ref);
 
 	return {
-	    all: tasks
+	    all: tasks,
+
+
+		fbLogin: function() {
+		 	ref.authWithOAuthPopup("facebook", function(error, authData) {
+			  if (error) {
+			    console.log("Login Failed!", error);
+			  } else {
+			    console.log("Authenticated successfully with payload:", authData);
+			  }
+			});
+		 },
+
+		signUp:	ref.createUser({
+			  email    : "iamtheepic@gmail.com",
+			  password : "kimchiplease"
+			}, function(error, userData) {
+			  if (error) {
+			    console.log("Error creating user:", error);
+			  } else {
+			    console.log("Successfully created user account with uid:", userData.uid);
+			  }
+			}),
+
+		signIn:	ref.authWithPassword({
+			  email    : "iamtheepic@gmail.com",
+			  password : "kimchiplease"
+			}, function(error, authData) {
+			  if (error) {
+			    console.log("Login Failed!", error);
+			  } else {
+			    console.log("Authenticated successfully with payload:", authData);
+			  }
+			}),
+
+		signOut:	ref.unauth()
+
 	};
 }])
 .constant("MY_EVENTS", {
