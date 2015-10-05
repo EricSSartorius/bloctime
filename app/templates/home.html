@@ -1,11 +1,11 @@
 	<aside id="sidebar" >
 	 <form role="form">
-        <input ng-model="user.email" type="email" placeholder="Email address" required="" autofocus="">
-        <input ng-model="user.password" type="password" placeholder="Password" required="">
+        <input ng-model="email" type="email" placeholder="Email address" required="" autofocus="">
+        <input ng-model="password" type="password" placeholder="Password" required="">
         <br/>
-        <button ng-click="SignUp($event)">SignUp</button>
-        <button ng-click="SignIn($event)">SignIn</button>
-        <button ng-show="true" ng-click="SignOut($event)">SignOut</button>
+        <button ng-click="signUp($event)">Sign Up</button>
+        <button ng-click="signIn($event)">Sign In</button>
+        <button ng-show="true" ng-click="signOut($event)">Sign Out</button>
       </form>
       <br/>
       <button ng-click="loginToFB($event)">FB LOGIN</button>

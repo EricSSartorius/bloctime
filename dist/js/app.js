@@ -46,27 +46,27 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
    		MyTasks.fbLogin();
     };
     $scope.signUp = function() {
-    	return MyTasks.signUp;
+    	 MyTasks.signUp($scope.email, $scope.password);
     };
-    $scope.signIn = function() {
-    	return MyTasks.signIn;
-    };
-    $scope.signOut = function() {
-		return MyTasks.signOut;
-    };
+  //   $scope.signIn = function() {
+  //   	 MyTasks.signIn();
+  //   };
+  //   $scope.signOut = function() {
+		// MyTasks.signOut();
+  //   };
     $scope.addTask = function() {
-      MyTasks.all.$add({
+      MyTasks.all().$add({
         content: $scope.task,
         timestamp: Firebase.ServerValue.TIMESTAMP
       });
       $scope.task = "";
     };
 
-    $scope.tasks = MyTasks.all;
+    $scope.tasks = MyTasks.all();
 
-    MyTasks.all.$loaded(function() {
-      if (MyTasks.all.length === 0) {
-        MyTasks.all.$add({
+    MyTasks.all().$loaded(function() {
+      if (MyTasks.all().length === 0) {
+        MyTasks.all().$add({
           content: "Add a new Task here!",
           timestamp: Firebase.ServerValue.TIMESTAMP
         });
@@ -76,12 +76,16 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 }])
 .factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
 
-	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com");
+	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
 
+	
+	var tasks = [];
 
 	function authDataCallback(authData) {
 	  if (authData) {
 	    console.log("User " + authData.uid + " is logged in with " + authData.provider);
+	    var taskRef = new Firebase("https://blinding-torch-8353.firebaseio.com/users/" + authData.uid);
+        tasks = $firebaseArray(taskRef);
 	  } else {
 	    console.log("User is logged out");
 	  }
@@ -95,11 +99,9 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	//   remember: "sessionOnly"
 	// });
 
-	var tasks = $firebaseArray(ref);
 
 	return {
-	    all: tasks,
-
+	    all: function(){return tasks;},
 
 		fbLogin: function() {
 		 	ref.authWithOAuthPopup("facebook", function(error, authData) {
@@ -111,16 +113,18 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 			});
 		 },
 
-		signUp:	ref.createUser({
-			  email    : "iamtheepic@gmail.com",
-			  password : "kimchiplease"
+		signUp:	function(email, password){
+			ref.createUser({
+			  email    : email,
+			  password : password
 			}, function(error, userData) {
 			  if (error) {
 			    console.log("Error creating user:", error);
 			  } else {
 			    console.log("Successfully created user account with uid:", userData.uid);
 			  }
-			}),
+			});
+		},
 
 		signIn:	ref.authWithPassword({
 			  email    : "iamtheepic@gmail.com",
