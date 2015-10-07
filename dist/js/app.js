@@ -1,4 +1,4 @@
-angular.module('blocPomodoro', ['firebase', 'ui.router'])
+angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
 .config(function($stateProvider, $urlRouterProvider, $locationProvider) {
  	$locationProvider.html5Mode({
        enabled: true,
@@ -11,22 +11,26 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller', ['$scope', '$rootScope', '$firebaseAuth','MyTasks', "Auth", function ($scope, $rootScope, $firebaseAuth, MyTasks, Auth) {
+.controller('Home.controller',  function ($scope, $rootScope, $firebaseAuth, MyTasks, Auth, $timeout, $mdSidenav, $mdUtil, $log) {
+    $scope.toggleRight = buildToggler('right');
+    function buildToggler(navID) {
+      var debounceFn =  $mdUtil.debounce(function(){
+            $mdSidenav(navID)
+              .toggle()
+              .then(function () {
+                $log.debug("toggle " + navID + " is done");
+              });
+          },200);
+      return debounceFn;
+    }
     Auth.$onAuth(function(authData) {
     	$scope.authData = authData;
     	console.log(authData);
     });
-
     $scope.loginToFB = function() {
    		Auth.$authWithOAuthPopup("facebook").catch(function(error) {
 			console.error(error);
 		});
-    };
-    $scope.optionToSignUp = function () {
-
-    };
-    $scope.optionToLogin = function () {
-
     };
     $scope.register = function() {
     	MyTasks.signUp($scope.email, $scope.password);
@@ -48,16 +52,14 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 
     $scope.tasks = MyTasks.all();
 
-    // MyTasks.all().$loaded(function() {
-    //   if (MyTasks.all().length === 0) {
-    //     MyTasks.all().$add({
-    //       content: "Add a new Task here!",
-    //       timestamp: Firebase.ServerValue.TIMESTAMP
-    //     });
-    //   }
-    // });
-
-}])
+})
+.controller('RightCtrl', function ($scope, $timeout, $mdSidenav, $log) {
+    $scope.close = function () {
+      $mdSidenav('right').close()
+        .then(function () {
+        });
+    };
+  })
 .factory('Auth', function($firebaseAuth) {
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
 	return $firebaseAuth(ref);
@@ -65,8 +67,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 .factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
 
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
-
-	
 	var tasks = [];
 
 	function authDataCallback(authData) {
@@ -79,14 +79,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	  }
 	}
 	ref.onAuth(authDataCallback);
-
-	// ref.authWithPassword({
-	//   email    : "iamtheepic@gmail.com",
-	//   password : "kimchiplease"
-	// }, function(error, authData) { /* Your Code */ }, {
-	//   remember: "sessionOnly"
-	// });
-
 
 	return {
 	    all: function(){return tasks;},
@@ -116,12 +108,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 
 	};
 }])
-.constant("MY_EVENTS", {
-	breakTime: 300,
-	workTime: 1500,
-	longBreakTime: 1800,
-	workCycle: 4
-})
 .directive('myButton', ['MY_EVENTS', "$interval", function(MY_EVENTS, $interval) {
     return {
         templateUrl: '/templates/mybutton.html',
@@ -206,6 +192,12 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
     	}
     }
  }])
+.constant("MY_EVENTS", {
+	breakTime: 300,
+	workTime: 1500,
+	longBreakTime: 1800,
+	workCycle: 4
+})
 .filter('timeFilter', function() {
     return function(seconds) {
         var timeFormat = new Date(0,0,0,0,0,0,0);
