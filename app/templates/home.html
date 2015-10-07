@@ -1,17 +1,19 @@
 	<aside id="sidebar" >
-	 <form role="form">
-        <input ng-model="email" type="email" placeholder="Email address" required="" autofocus="">
-        <input ng-model="password" type="password" placeholder="Password" required="">
-        <br/>
-        <button ng-click="signUp($event)">Sign Up</button>
-        <button ng-click="signIn($event)">Sign In</button>
-        <button ng-show="true" ng-click="signOut($event)">Sign Out</button>
-      </form>
-      <br/>
-      <button ng-click="loginToFB($event)">FB LOGIN</button>
-      <br/>
-		<h1>Task History</h1>
-		 <form ng-submit="addTask()">
+		<button class="logout" ng-show="authData" ng-click="logOut($event)">Logout</button>
+	 	<div class="login" ng-show="!authData">
+		 	<form role="form">
+		        <input ng-model="email" type="email" placeholder="Email address" required="" autofocus="">
+		        <input ng-model="password" type="password" placeholder="Password" required="">
+		        <span>
+		        <button ng-show="register" ng-click="register($event)">Register</button>
+		        <button ng-show="register" ng-click="login($event)">Login</button>
+		        </span>
+	    	</form>
+	    	<button ng-show="!authData" ng-click="loginToFB($event)">Login With Facebook</button>
+    	</div>
+	    <div ng-show="authData">
+		<h1>My Tasks</h1>
+		<form ng-submit="addTask()">
     		<input placeholder="Add new task" type="text" ng-model="task">
     		<input type="submit">
   		</form>
@@ -20,7 +22,8 @@
 		 	{{ task.content }}
 		 	<a href="" ng-click="tasks.$remove(task)">X</a>
     		</li>
- 		 </ul>
+ 		</ul>
+ 		</div>
      
 	</aside>
 	<section id="content">

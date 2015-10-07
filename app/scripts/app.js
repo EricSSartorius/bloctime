@@ -11,49 +11,33 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller', ['$scope', '$rootScope', '$firebaseAuth','MyTasks', function ($scope, $rootScope, $firebaseAuth, MyTasks) {
-
-    // $scope.signIn = function () {
-    //   $rootScope.auth.$login('password', {
-    //     email: $scope.email,
-    //     password: $scope.password
-    //   }).then(function(user) {
-    //     $rootScope.alert.message = '';
-    //   }, function(error) {
-    //     if (error = 'INVALID_EMAIL') {
-    //       console.log('email invalid or not signed up — trying to sign you up!');
-    //       $scope.signUp();
-    //     } else if (error = 'INVALID_PASSWORD') {
-    //       console.log('wrong password!');
-    //     } else {
-    //       console.log(error);
-    //     }
-    //   });
-    // };
-
-    // $scope.signUp = function() {
-    //   $rootScope.auth.$createUser($scope.email, $scope.password, function(error, user) {
-    //     if (!error) {
-    //       $rootScope.alert.message = '';
-    //     } else {
-    //       $rootScope.alert.class = 'danger';
-    //       $rootScope.alert.message = 'The username and password combination you entered is invalid.';
-    //     }
-    //   });
-    // };
+.controller('Home.controller', ['$scope', '$rootScope', '$firebaseAuth','MyTasks', "Auth", function ($scope, $rootScope, $firebaseAuth, MyTasks, Auth) {
+    Auth.$onAuth(function(authData) {
+    	$scope.authData = authData;
+    	console.log(authData);
+    });
 
     $scope.loginToFB = function() {
-   		MyTasks.fbLogin();
+   		Auth.$authWithOAuthPopup("facebook").catch(function(error) {
+			console.error(error);
+		});
     };
-    $scope.signUp = function() {
-    	 MyTasks.signUp($scope.email, $scope.password);
+    $scope.optionToSignUp = function () {
+
     };
-  //   $scope.signIn = function() {
-  //   	 MyTasks.signIn();
-  //   };
-  //   $scope.signOut = function() {
-		// MyTasks.signOut();
-  //   };
+    $scope.optionToLogin = function () {
+
+    };
+    $scope.register = function() {
+    	MyTasks.signUp($scope.email, $scope.password);
+    	MyTasks.logIn($scope.email, $scope.password);
+    };
+    $scope.login = function() {
+    	MyTasks.logIn($scope.email, $scope.password);
+    };
+    $scope.logOut = function() {
+		Auth.$unauth();
+    };
     $scope.addTask = function() {
       MyTasks.all().$add({
         content: $scope.task,
@@ -64,16 +48,20 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 
     $scope.tasks = MyTasks.all();
 
-    MyTasks.all().$loaded(function() {
-      if (MyTasks.all().length === 0) {
-        MyTasks.all().$add({
-          content: "Add a new Task here!",
-          timestamp: Firebase.ServerValue.TIMESTAMP
-        });
-      }
-    });
+    // MyTasks.all().$loaded(function() {
+    //   if (MyTasks.all().length === 0) {
+    //     MyTasks.all().$add({
+    //       content: "Add a new Task here!",
+    //       timestamp: Firebase.ServerValue.TIMESTAMP
+    //     });
+    //   }
+    // });
 
 }])
+.factory('Auth', function($firebaseAuth) {
+	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
+	return $firebaseAuth(ref);
+})
 .factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
 
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
@@ -103,16 +91,6 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 	return {
 	    all: function(){return tasks;},
 
-		fbLogin: function() {
-		 	ref.authWithOAuthPopup("facebook", function(error, authData) {
-			  if (error) {
-			    console.log("Login Failed!", error);
-			  } else {
-			    console.log("Authenticated successfully with payload:", authData);
-			  }
-			});
-		 },
-
 		signUp:	function(email, password){
 			ref.createUser({
 			  email    : email,
@@ -125,19 +103,16 @@ angular.module('blocPomodoro', ['firebase', 'ui.router'])
 			  }
 			});
 		},
-
-		signIn:	ref.authWithPassword({
-			  email    : "iamtheepic@gmail.com",
-			  password : "kimchiplease"
+		logIn: function(email, password) {
+			ref.authWithPassword({
+			  email    : email,
+			  password : password
 			}, function(error, authData) {
 			  if (error) {
 			    console.log("Login Failed!", error);
-			  } else {
-			    console.log("Authenticated successfully with payload:", authData);
-			  }
-			}),
-
-		signOut:	ref.unauth()
+			  } 
+			});
+		},
 
 	};
 }])
