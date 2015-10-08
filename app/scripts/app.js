@@ -34,7 +34,6 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
     };
     $scope.register = function() {
     	Auth.signUp($scope.email, $scope.password);
-    	Auth.logIn($scope.email, $scope.password);
     };
     $scope.login = function() {
     	Auth.logIn($scope.email, $scope.password);
@@ -80,6 +79,7 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
 			    alert("Error creating user. Please try again.");
 			  } else {
 			    console.log("Successfully created user account with uid:", userData.uid);
+			    alert("Thank you for registering. Please login.", userData.uid);
 			  }
 			});
 		},
