@@ -11,7 +11,7 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
 		templateUrl: '/templates/home.html',
     });
 })
-.controller('Home.controller',  function ($scope, $rootScope, $firebaseAuth, MyTasks, Auth, $timeout, $mdSidenav, $mdUtil, $log) {
+.controller('Home.controller',  function ($scope, $rootScope, MyTasks, Auth, $timeout, $mdSidenav, $mdUtil, $log) {
     $scope.toggleRight = buildToggler('right');
     function buildToggler(navID) {
       var debounceFn =  $mdUtil.debounce(function(){
@@ -23,25 +23,30 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
           },200);
       return debounceFn;
     }
-    Auth.$onAuth(function(authData) {
+    Auth.firebaseAuth.$onAuth(function(authData) {
     	$scope.authData = authData;
     	console.log(authData);
     });
     $scope.loginToFB = function() {
-   		Auth.$authWithOAuthPopup("facebook").catch(function(error) {
+   		Auth.firebaseAuth.$authWithOAuthPopup("facebook").catch(function(error) {
 			console.error(error);
 		});
     };
     $scope.register = function() {
-    	MyTasks.signUp($scope.email, $scope.password);
-    	MyTasks.logIn($scope.email, $scope.password);
+    	Auth.signUp($scope.email, $scope.password);
+    	Auth.logIn($scope.email, $scope.password);
     };
     $scope.login = function() {
-    	MyTasks.logIn($scope.email, $scope.password);
+    	Auth.logIn($scope.email, $scope.password);
     };
     $scope.logOut = function() {
-		Auth.$unauth();
+		Auth.firebaseAuth.$unauth();
+		
     };
+    $rootScope.$on("reset", function(event){
+		$scope.tasks = MyTasks.all();
+		console.log("tasks reset");
+	});
     $scope.addTask = function() {
       MyTasks.all().$add({
         content: $scope.task,
@@ -62,9 +67,36 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
   })
 .factory('Auth', function($firebaseAuth) {
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
-	return $firebaseAuth(ref);
+
+	return {
+		firebaseAuth: $firebaseAuth(ref),
+		signUp:	function(email, password){
+			ref.createUser({
+			  email    : email,
+			  password : password
+			}, function(error, userData) {
+			  if (error) {
+			    console.log("Error creating user:", error);
+			    alert("Error creating user. Please try again.");
+			  } else {
+			    console.log("Successfully created user account with uid:", userData.uid);
+			  }
+			});
+		},
+		logIn: function(email, password) {
+			ref.authWithPassword({
+			  email    : email,
+			  password : password,
+			}, function(error, authData) {
+			  if (error) {
+			    console.log("Login Failed!", error);
+			    alert("Username or Password is incorrect. Please try again.");
+			  } 
+			});
+		}
+	}
 })
-.factory('MyTasks', ['$firebaseArray', function($firebaseArray) {
+.factory('MyTasks', ['$firebaseArray','$rootScope', function($firebaseArray, $rootScope) {
 
 	var ref = new Firebase("https://blinding-torch-8353.firebaseio.com/");
 	var tasks = [];
@@ -77,35 +109,12 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
 	  } else {
 	    console.log("User is logged out");
 	  }
+	   $rootScope.$emit('reset');
 	}
 	ref.onAuth(authDataCallback);
 
 	return {
-	    all: function(){return tasks;},
-
-		signUp:	function(email, password){
-			ref.createUser({
-			  email    : email,
-			  password : password
-			}, function(error, userData) {
-			  if (error) {
-			    console.log("Error creating user:", error);
-			  } else {
-			    console.log("Successfully created user account with uid:", userData.uid);
-			  }
-			});
-		},
-		logIn: function(email, password) {
-			ref.authWithPassword({
-			  email    : email,
-			  password : password
-			}, function(error, authData) {
-			  if (error) {
-			    console.log("Login Failed!", error);
-			  } 
-			});
-		},
-
+	    all: function(){return tasks;}
 	};
 }])
 .directive('myButton', ['MY_EVENTS', "$interval", function(MY_EVENTS, $interval) {
@@ -130,7 +139,6 @@ angular.module('blocPomodoro', ['firebase', 'ngMaterial', 'ui.router'])
   				formats: [ 'mp3' ],
   				preload: true
 			});
-
     		scope.determineBreak = function() {
     			if (scope.sessionCounter === MY_EVENTS.workCycle) {
     				scope.theTime = MY_EVENTS.longBreakTime;

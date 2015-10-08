@@ -36,8 +36,8 @@
       	</div>
       	<div ng-show="authData">
 	     	<form ng-submit="addTask()">
-	    		<input placeholder="Add new task" type="text" ng-model="task">
-	    		<input type="submit">
+	    		<input placeholder="Add new task" type="text" ng-model="$parent.task">
+	    		<input class="md-button" type="submit">
 	  		</form>
 			<ul class="task-list">
 	    		<li ng-repeat="task in tasks | orderBy:'timestamp':'reverse'">
@@ -47,7 +47,7 @@
 	 		</ul>
  		</div>
         <md-button ng-click="close()" class="md-primary">
-          Close Task List
+          Hide Task List
         </md-button>
       </md-content>
     </md-sidenav>
